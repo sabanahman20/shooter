@@ -22,15 +22,34 @@ window.addEventListener("load", function(){
 	class Bullet{//это класс пулька (класс это чертёж для создания множества объектов)
 		constructor(){//это конструктор класса
 			this.X = spaceship.X + spaceship.Size/2-10/2;//это свойство X
-			this.Y = 550;//это свойство Y
+			this.Y = 600;//это свойство Y
 			this.Size = 10;//размер нашей пульки
-			this.Speed = 5;//сорость полёта пули
+			this.Speed = 5;//скорость полёта пули
+			this.Del = false;//метка удаления пульки
 		
 		}
 		Move(){
-				this.Y -= this.Speed;	
+				this.Y -= this.Speed;
+				if(this.Y < 300){
+					this.Del = true;
+				}
 			}
 	}
+	function clearAll(arr){
+		var temp = [];
+		for(var i = 0; i < arr.length; i++){
+			if(arr[i].Del == false){
+				temp.push(arr[i]); 
+			}
+		}
+		return temp;
+	};
+	function update(){//функция обновления игрового мира//
+		for(var i = 0; i <spaceship.bullets.length; i++ ){
+			spaceship.bullets[i].Move();
+		}
+		spaceship.bullets = clearAll(spaceship.bullets);
+	};
 	function draw(){//отрисовка игровова мира//
 		scena.clearRect(0,0,canvas.width,canvas.height);//очистка всего игрового поля//
 		scena.drawImage(spaceship.sprite,spaceship.X,spaceship.Y,spaceship.Size,spaceship.Size);
@@ -39,6 +58,7 @@ window.addEventListener("load", function(){
 		}
 	};
 	function game(){
+		update();
 		draw();
 		window.requestAnimationFrame(function(){
 			game();
