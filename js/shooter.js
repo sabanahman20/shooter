@@ -1,6 +1,8 @@
 window.addEventListener("load", function(){
 	var canvas = document.querySelector("#holst");
 	var scena = canvas.getContext("2d");
+	var fon = new Image();
+	var meteorits = [];
 	var spaceship = {//объект корабль в литеральной нотации
 		Name:"Покоритель небытия",
 		Size:50,
@@ -8,6 +10,9 @@ window.addEventListener("load", function(){
 		Y:600,
 		sprite:new Image(),
 		bullets:[],
+		IsShooting:false,
+		ShootInterval:40,
+		sound:new Audio("sounds/blaster.mp3"),
 		Move:function(dx){
 			this.X += dx;
 			if(this.X < 0 || this.X > canvas.width - this.Size){
@@ -15,8 +20,21 @@ window.addEventListener("load", function(){
 			}
 			
 		},
+		ShootDelay:function(){
+			if(this.IsShooting == true){
+				this.ShootInterval--;
+				if(this.ShootInterval == 0){
+					this.ShootInterval = 40;
+					this.IsShooting = false;
+				}
+			}
+		},
 		Shoot:function(){
-			this.bullets.push(new Bullet());
+			if(this.IsShooting == false){
+				this.bullets.push(new Bullet());
+				this.sound.play();
+				this.IsShooting = true;
+			};
 		}
 	};
 	class Bullet{//это класс пулька (класс это чертёж для создания множества объектов)
@@ -30,10 +48,25 @@ window.addEventListener("load", function(){
 		}
 		Move(){
 				this.Y -= this.Speed;
-				if(this.Y < 300){
+				if(this.Y < 0){
 					this.Del = true;
 				}
 			}
+	}
+	class Meteor{
+		constructor(){
+			this.X = 0;
+			this.Y = 0;
+			this.Size = 50;
+			this.Speed = 3;
+			this.Del = false;
+		}
+		Move(){
+			this.Y += this.Speed;
+			if(this.Y > canvas.height){
+				this.Del = true;
+			}
+		}
 	}
 	function clearAll(arr){
 		var temp = [];
@@ -45,18 +78,25 @@ window.addEventListener("load", function(){
 		return temp;
 	};
 	function update(){//функция обновления игрового мира//
+		meteorits.push(new Meteor())
+		spaceship.ShootDelay();
 		for(var i = 0; i <spaceship.bullets.length; i++ ){
 			spaceship.bullets[i].Move();
 		}
 		spaceship.bullets = clearAll(spaceship.bullets);
+		
 	};
 	function draw(){//отрисовка игровова мира//
-		scena.clearRect(0,0,canvas.width,canvas.height);//очистка всего игрового поля//
+		scena.drawImage(fon,0,0,canvas.width,canvas.height);//очистка всего игрового поля//
 		scena.drawImage(spaceship.sprite,spaceship.X,spaceship.Y,spaceship.Size,spaceship.Size);
+		for(var i = 0; i < meteorits.length; i++){
+			scena.fillRect(meteorits[i].X, meteorits[i].Y,meteorits[i].Size,meteorits[i].Size);
+		}
 		for(var i = 0; i < spaceship.bullets.length; i++){
 			scena.fillRect(spaceship.bullets[i].X, spaceship.bullets[i].Y,spaceship.bullets[i].Size,spaceship.bullets[i].Size);
 		}
 	};
+	
 	function game(){
 		update();
 		draw();
@@ -65,7 +105,8 @@ window.addEventListener("load", function(){
 		});
 	};
 	spaceship.sprite.src = "images/spaceship.png";
-	spaceship.sprite.addEventListener("load",function(){
+	fon.src = "images/space.jpg";
+	fon.addEventListener("load",function(){
 		window.addEventListener("keydown",function(play){
 			if(play.keyCode == 39){
 				spaceship.Move(10);
