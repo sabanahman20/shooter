@@ -60,7 +60,7 @@ window.addEventListener("load", function(){
 	}
 	class Meteor{
 		constructor(){
-			this.X = rnd(0,(canvas.width/50)*50); /*rnd(0,600)*/;
+			this.X = rnd(0,(canvas.width/50)*50); /*rnd(0,600)33*/;
 			this.Y = 0;
 			this.Size = 50;
 			this.Speed = 3;
