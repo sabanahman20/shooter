@@ -3,6 +3,11 @@ window.addEventListener("load", function(){
 	var scena = canvas.getContext("2d");
 	var fon = new Image();
 	var meteorits = [];
+	var speedGeneration = 100;
+	function rnd(min, max){//генерато случайного числа от мин до макс.
+		var r = min + Math.random() * (max - min + 1);
+		return Math.floor(r);
+	}
 	var spaceship = {//объект корабль в литеральной нотации
 		Name:"Покоритель небытия",
 		Size:50,
@@ -55,7 +60,7 @@ window.addEventListener("load", function(){
 	}
 	class Meteor{
 		constructor(){
-			this.X = 0;
+			this.X = rnd(0,(canvas.width/50)*50); /*rnd(0,600)*/;
 			this.Y = 0;
 			this.Size = 50;
 			this.Speed = 3;
@@ -77,8 +82,19 @@ window.addEventListener("load", function(){
 		}
 		return temp;
 	};
+	function meteorGenerator(){
+		speedGeneration--;
+		if(speedGeneration == 0){
+			speedGeneration = 100;
+			meteorits.push(new Meteor());
+		}
+	}
 	function update(){//функция обновления игрового мира//
-		meteorits.push(new Meteor())
+		meteorGenerator();
+		for(var i = 0; i < meteorits.length; i++){
+			meteorits[i].Move();
+		}
+		meteorits = clearAll(meteorits);
 		spaceship.ShootDelay();
 		for(var i = 0; i <spaceship.bullets.length; i++ ){
 			spaceship.bullets[i].Move();
